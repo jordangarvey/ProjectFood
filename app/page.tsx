@@ -23,7 +23,7 @@ function Home() {
 			streamRef.current = stream;
 			setIsCameraOpen(true);
 			setError(null);
-		} catch (err) {
+		} catch {
 			setError("Unable to access camera. Please make sure you have granted camera permissions.");
 		}
 	};
@@ -77,7 +77,7 @@ function Home() {
 
 			await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
 			setRecipes(mockRecipes);
-		} catch (err) {
+		} catch {
 			setError("Failed to generate recipes. Please try again.");
 		} finally {
 			setIsLoading(false);
