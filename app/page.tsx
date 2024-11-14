@@ -68,7 +68,21 @@ function Home() {
 		setIsLoading(true);
 		setError(undefined);
 
+		const formData = new FormData();
+		formData.append("file", image!, "upload.png");
+
 		try {
+			fetch(
+				"/api/image/analyse",
+				{
+					method: "POST",
+					body: image,
+					headers: {
+						"Content-Type": "image/jpeg"
+					}
+				}
+			);
+
 			// This is where you would implement the actual API call to OpenAI
 			// For demonstration, we'll simulate a response
 			const mockRecipes = [
