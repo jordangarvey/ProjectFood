@@ -15,14 +15,10 @@
 		"arrow-spacing": ["error", { "after": true, "before": true }],
 		"space-infix-ops": ["error", { "int32Hint": false }],
 		"@typescript-eslint/no-require-imports": "off",
+		"@typescript-eslint/no-explicit-any": "off",
 		"keyword-spacing": ["error", {
 			"before": true,
-			"after": true,
-			"overrides": {
-				"return": { "after": true },
-				"catch": { "after": false },
-				"if": { "after": false }
-			}
+			"after": true
 		}]
 	}
 }

@@ -36,7 +36,7 @@ function Home() {
 	};
 
 	const stopCamera = () => {
-		if(streamRef.current) {
+		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track: any) => track.stop());
 			setIsCameraOpen(false);
 		}
@@ -50,7 +50,7 @@ function Home() {
 		canvas.getContext("2d")?.drawImage(video, 0, 0);
 
 		canvas.toBlob((blob) => {
-			if(blob) {
+			if (blob) {
 				setImage(blob);
 				stopCamera();
 			}
@@ -59,7 +59,7 @@ function Home() {
 
 	const handleFileUpload = (event: any) => {
 		const file = event.target.files[0];
-		if(file) {
+		if (file) {
 			setImage(file);
 		}
 	};
