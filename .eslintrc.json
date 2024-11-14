@@ -19,7 +19,9 @@
 			"before": true,
 			"after": true,
 			"overrides": {
-				"return": { "after": true }
+				"return": { "after": true },
+				"catch": { "after": false },
+				"if": { "after": false }
 			}
 		}]
 	}
