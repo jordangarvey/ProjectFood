@@ -3,17 +3,24 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Camera, Upload, ChefHat, Loader2 } from "lucide-react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
+type recipe = {
+	name: string;
+	instructions: string;
+	ingredients: string[];
+};
+
 function Home() {
-	const [image, setImage] = useState(null);
+	const [image, setImage] = useState<Blob>();
 	const [isLoading, setIsLoading] = useState(false);
-	const [recipes, setRecipes] = useState(null);
-	const [error, setError] = useState(null);
-	const videoRef = useRef(null);
-	const streamRef = useRef(null);
+	const [recipes, setRecipes] = useState<recipe[]>();
+	const [error, setError] = useState<string>();
+	const videoRef = useRef<any>(null);
+	const streamRef = useRef<any>(null);
 	const [isCameraOpen, setIsCameraOpen] = useState(false);
 
 	const startCamera = async () => {
@@ -22,15 +29,15 @@ function Home() {
 			videoRef.current.srcObject = stream;
 			streamRef.current = stream;
 			setIsCameraOpen(true);
-			setError(null);
-		} catch (err) {
+			setError(undefined);
+		} catch(err) {
 			setError("Unable to access camera. Please make sure you have granted camera permissions.");
 		}
 	};
 
 	const stopCamera = () => {
-		if (streamRef.current) {
-			streamRef.current.getTracks().forEach(track => track.stop());
+		if(streamRef.current) {
+			streamRef.current.getTracks().forEach((track: any) => track.stop());
 			setIsCameraOpen(false);
 		}
 	};
@@ -40,25 +47,27 @@ function Home() {
 		const canvas = document.createElement("canvas");
 		canvas.width = video.videoWidth;
 		canvas.height = video.videoHeight;
-		canvas.getContext("2d").drawImage(video, 0, 0);
-    
+		canvas.getContext("2d")?.drawImage(video, 0, 0);
+
 		canvas.toBlob((blob) => {
-			setImage(blob);
-			stopCamera();
+			if(blob) {
+				setImage(blob);
+				stopCamera();
+			}
 		}, "image/jpeg");
 	};
 
-	const handleFileUpload = (event) => {
+	const handleFileUpload = (event: any) => {
 		const file = event.target.files[0];
-		if (file) {
+		if(file) {
 			setImage(file);
 		}
 	};
 
 	const generateRecipes = async () => {
 		setIsLoading(true);
-		setError(null);
-    
+		setError(undefined);
+
 		try {
 			// This is where you would implement the actual API call to OpenAI
 			// For demonstration, we'll simulate a response
@@ -77,7 +86,7 @@ function Home() {
 
 			await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
 			setRecipes(mockRecipes);
-		} catch (err) {
+		} catch(err) {
 			setError("Failed to generate recipes. Please try again.");
 		} finally {
 			setIsLoading(false);
@@ -90,7 +99,7 @@ function Home() {
 				<CardHeader>
 					<CardTitle>AI Recipe Generator</CardTitle>
 					<CardDescription>
-            Take a photo or upload an image of your ingredients to get recipe ideas
+						Take a photo or upload an image of your ingredients to get recipe ideas
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
@@ -107,9 +116,9 @@ function Home() {
 							{isCameraOpen ? "Close Camera" : "Open Camera"}
 						</Button>
 
-						<Button variant="outline" onClick={() => document.getElementById("file-upload").click()}>
+						<Button variant="outline" onClick={() => document.getElementById("file-upload")?.click()}>
 							<Upload className="mr-2 h-4 w-4" />
-              Upload Photo
+							Upload Photo
 						</Button>
 						<input
 							id="file-upload"
@@ -159,7 +168,7 @@ function Home() {
 								) : (
 									<>
 										<ChefHat className="mr-2 h-4 w-4" />
-                    Generate Recipes
+										Generate Recipes
 									</>
 								)}
 							</Button>
