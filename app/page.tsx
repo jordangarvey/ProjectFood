@@ -73,17 +73,14 @@ function Home() {
 		setError(undefined);
 
 		const formData = new FormData();
-		formData.append("file", image!, "upload.png");
+		formData.append("file", image!, "food.png");
 
 		try {
 			fetch(
 				"/api/image/analyse",
 				{
 					method: "POST",
-					body: image,
-					headers: {
-						"Content-Type": "image/jpeg"
-					}
+					body: formData
 				}
 			);
 
