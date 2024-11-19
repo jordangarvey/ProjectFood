@@ -15,7 +15,7 @@ type recipe = {
 };
 
 function Home() {
-	const [image, setImage] = useState<Blob>();
+	const [image, setImage] = useState<File>();
 	const [isLoading, setIsLoading] = useState(false);
 	const [recipes, setRecipes] = useState<recipe[]>();
 	const [error, setError] = useState<string>();
@@ -53,7 +53,7 @@ function Home() {
 
 		canvas.toBlob((blob) => {
 			if (blob) {
-				setImage(blob);
+				setImage(blob as File);
 				stopCamera();
 			}
 		}, "image/jpeg");
