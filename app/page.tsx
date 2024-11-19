@@ -19,10 +19,12 @@ function Home() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [recipes, setRecipes] = useState<recipe[]>();
 	const [error, setError] = useState<string>();
-	const videoRef = useRef<any>(null);
-	const streamRef = useRef<any>(null);
 	const [isCameraOpen, setIsCameraOpen] = useState(false);
 
+	const videoRef = useRef<any>(null);
+	const streamRef = useRef<any>(null);
+
+	// TODO: need to get this working
 	const startCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
