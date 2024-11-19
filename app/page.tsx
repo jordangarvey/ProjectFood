@@ -67,6 +67,8 @@ function Home() {
 	};
 
 	const generateRecipes = async () => {
+		if (isLoading) return;
+
 		setIsLoading(true);
 		setError(undefined);
 
