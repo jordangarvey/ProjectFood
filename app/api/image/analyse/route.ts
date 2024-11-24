@@ -1,59 +1,26 @@
-import { NextResponse, NextRequest } from "next/server";
-import { Configuration, OpenAIApi } from "openai";
-import formidable, { File } from "formidable";
-import fs from "fs";
-import { Readable } from "stream";
+import { NextRequest, NextResponse } from "next/server";
 
-export const config = {
-	api: { bodyParser: false },
-};
+import { analyseImage } from "@/lib/analyse";
 
-// Convert a Next.js ReadableStream into a Node.js-readable buffer
-async function streamToBuffer(stream: ReadableStream): Promise<Buffer> {
-	const reader = stream.getReader();
-	const chunks: Uint8Array[] = [];
+async function POST(req: NextRequest) {
+	const formData = await req.formData();
+	const file = formData.get("file") as File;
 
-	while (true) {
-		const { done, value } = await reader.read();
-		if (done) break;
-		chunks.push(value);
+	if (!file) return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+
+	const arrayBuffer = await file.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
+
+	try {
+		const ingredients = await analyseImage(buffer);
+		return NextResponse.json({ success: true, ingredients: ingredients });
+
+	} catch (error) {
+		console.error("Error analysing image:", error);
+		return NextResponse.json({ error: "Unable to analyse image" }, { status: 500 });
 	}
-
-	return Buffer.concat(chunks);
 }
 
-export async function POST(req: NextRequest) {
-	const buffer = await streamToBuffer(req.body as ReadableStream);
-
-	const form = formidable({ multiples: false });
-
-	return new Promise((resolve) => {
-		// Use `parse` on a simulated incoming request with the Buffer
-		form.parse(Readable.from(buffer) as any, async (err: Error | null, fields: formidable.Fields, files: formidable.Files) => {
-			if (err) {
-				console.error("Error parsing file:", err);
-				resolve(NextResponse.json({ error: "File parsing failed" }, { status: 500 }));
-				return;
-			}
-
-			const file = files.file as File;
-			const imagePath = file.filepath;
-			const imageStream = fs.createReadStream(imagePath);
-
-			try {
-				const configuration = new Configuration({ apiKey: process.env.OPENAI_API_KEY });
-				const openai = new OpenAIApi(configuration);
-
-				const response = await openai.createImageEdit({
-					file: imageStream,
-					prompt: "Analyze this image",
-				});
-
-				resolve(NextResponse.json(response.data, { status: 200 }));
-			} catch (error) {
-				console.error("OpenAI API request failed:", error);
-				resolve(NextResponse.json({ error: "Failed to analyze image" }, { status: 500 }));
-			}
-		});
-	});
-}
+export {
+	POST
+};
