@@ -1,6 +1,9 @@
 import OpenAI from "openai";
+import { z } from "zod";
 
-async function generateRecipe(ingredients: string[]) {
+import recipe from "@/models/recipe";
+
+async function generateRecipe(ingredients: string[]): Promise<recipe> {
 	const ai = new OpenAI({
 		apiKey: process.env.OPENAI_API_KEY,
 	});
@@ -15,6 +18,8 @@ async function generateRecipe(ingredients: string[]) {
 					Generate a single recipe using the following ingredients: ${ingredients.join(", ")}.
 					I need the response as a JSON object using the following schema:
 					{
+						// The name of the recipe
+						name: string,
 						// The ingredients used in the recipe
 						"ingredients": string[],
 						// How to cook the recipe. This string should be in Markdown syntax.
@@ -32,7 +37,24 @@ async function generateRecipe(ingredients: string[]) {
 
 		if (!response.choices?.[0].message?.content) throw new Error("No acceptable response from OpenAI");
 
-		return response.choices[0].message.content;
+		const formattedRecipe = JSON.parse(response.choices[0].message.content);
+
+		// TODO: can we generate the type from Zod?
+		const recipeSchema = z.object({
+			name: z.string(),
+			ingredients: z.array(z.string()),
+			method: z.string(),
+			time: z.number()
+		}).passthrough();
+
+		try {
+			recipeSchema.parse(formattedRecipe);
+		} catch (error) {
+			console.error("Error parsing recipe response:", error);
+			throw error;
+		}
+
+		return formattedRecipe;
 	} catch (error) {
 		console.error("Error fetching recipe:", error);
 		throw error;

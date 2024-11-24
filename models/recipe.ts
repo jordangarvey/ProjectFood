@@ -1,4 +1,5 @@
 type recipe = {
+	name: string;
 	/** Array of ingredients required to make */
 	ingredients: string[];
 	/** Recipe method, in Markdown format */
