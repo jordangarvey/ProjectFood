@@ -41,6 +41,8 @@ async function analyseImage(imageBuffer: Buffer) {
 
 		const ingredients = selectFoodLabels(response.Labels);
 
+		console.debug("Detected ingredients:", ingredients);
+
 		return ingredients;
 	} catch (error) {
 		console.error("Rekognition Error:", error);
