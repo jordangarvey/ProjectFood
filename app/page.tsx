@@ -3,26 +3,25 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Camera, Upload, ChefHat, Loader2 } from "lucide-react";
+import Markdown from "react-markdown";
+
+import recipe from "@/models/recipe";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-type recipe = {
-	name: string;
-	instructions: string;
-	ingredients: string[];
-};
-
 function Home() {
-	const [image, setImage] = useState<Blob>();
+	const [image, setImage] = useState<File>();
 	const [isLoading, setIsLoading] = useState(false);
-	const [recipes, setRecipes] = useState<recipe[]>();
+	const [recipeData, setRecipeData] = useState<recipe>();
 	const [error, setError] = useState<string>();
-	const videoRef = useRef<any>(null);
-	const streamRef = useRef<any>(null);
 	const [isCameraOpen, setIsCameraOpen] = useState(false);
 
+	const videoRef = useRef<any>(null);
+	const streamRef = useRef<any>(null);
+
+	// TODO: need to get this working
 	const startCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -51,7 +50,7 @@ function Home() {
 
 		canvas.toBlob((blob) => {
 			if (blob) {
-				setImage(blob);
+				setImage(blob as File);
 				stopCamera();
 			}
 		}, "image/jpeg");
@@ -65,27 +64,28 @@ function Home() {
 	};
 
 	const generateRecipes = async () => {
+		if (isLoading) return;
+
 		setIsLoading(true);
 		setError(undefined);
 
-		try {
-			// This is where you would implement the actual API call to OpenAI
-			// For demonstration, we'll simulate a response
-			const mockRecipes = [
-				{
-					name: "Vegetable Stir Fry",
-					ingredients: ["carrots", "broccoli", "bell peppers"],
-					instructions: "1. Chop vegetables\n2. Heat oil in pan\n3. Stir fry vegetables"
-				},
-				{
-					name: "Garden Salad",
-					ingredients: ["lettuce", "tomatoes", "cucumber"],
-					instructions: "1. Wash vegetables\n2. Chop ingredients\n3. Mix in bowl"
-				}
-			];
+		const formData = new FormData();
+		formData.append("file", image!, "food.png");
 
-			await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API delay
-			setRecipes(mockRecipes);
+		try {
+			const response = await fetch(
+				"/api/image/analyse",
+				{
+					method: "POST",
+					body: formData
+				}
+			);
+
+			const jsonResponse = await response.json();
+
+			if (!jsonResponse.recipe) throw new Error("No recipe data returned");
+
+			setRecipeData(jsonResponse.recipe);
 		} catch {
 			setError("Failed to generate recipes. Please try again.");
 		} finally {
@@ -111,9 +111,9 @@ function Home() {
 					)}
 
 					<div className="flex gap-2">
-						<Button onClick={isCameraOpen ? stopCamera : startCamera}>
+						<Button onClick={isCameraOpen ? stopCamera : startCamera} disabled={true}>
 							<Camera className="mr-2 h-4 w-4" />
-							{isCameraOpen ? "Close Camera" : "Open Camera"}
+							{isCameraOpen ? "Close Camera" : "Open Camera (Coming soon)"}
 						</Button>
 
 						<Button variant="outline" onClick={() => document.getElementById("file-upload")?.click()}>
@@ -163,7 +163,7 @@ function Home() {
 								{isLoading ? (
 									<>
 										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating Recipes...
+										Generating Recipes...
 									</>
 								) : (
 									<>
@@ -175,27 +175,25 @@ function Home() {
 						</div>
 					)}
 
-					{recipes && (
+					{recipeData && (
 						<div className="space-y-4">
-							{recipes.map((recipe, index) => (
-								<Card key={index}>
-									<CardHeader>
-										<CardTitle>{recipe.name}</CardTitle>
-									</CardHeader>
-									<CardContent>
-										<div className="space-y-2">
-											<h4 className="font-semibold">Ingredients:</h4>
-											<ul className="list-disc pl-4">
-												{recipe.ingredients.map((ingredient, i) => (
-													<li key={i}>{ingredient}</li>
-												))}
-											</ul>
-											<h4 className="font-semibold">Instructions:</h4>
-											<p className="whitespace-pre-line">{recipe.instructions}</p>
-										</div>
-									</CardContent>
-								</Card>
-							))}
+							<Card>
+								<CardHeader>
+									<CardTitle>{recipeData.name}</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<div className="space-y-2">
+										<h4 className="font-semibold">Ingredients:</h4>
+										<ul className="list-disc pl-4">
+											{recipeData.ingredients.map((ingredient, i) => (
+												<li key={i}>{ingredient}</li>
+											))}
+										</ul>
+										<h4 className="font-semibold">Instructions:</h4>
+										<Markdown className="whitespace-pre-line">{recipeData.method}</Markdown>
+									</div>
+								</CardContent>
+							</Card>
 						</div>
 					)}
 				</CardContent>
