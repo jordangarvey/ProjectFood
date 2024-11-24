@@ -2,6 +2,8 @@ import { RekognitionClient, DetectLabelsCommand, Label } from "@aws-sdk/client-r
 
 const rekognitionClient = new RekognitionClient({ region: process.env.AWS_REGION });
 
+// FIXME: this sometimes includes the label `food`, `produce`, `brunch` _etc_.
+// Need to see if we can filter just by specific food items.
 function selectFoodLabels(labels: Label[]) {
 	const ingredients: string[] = [];
 
