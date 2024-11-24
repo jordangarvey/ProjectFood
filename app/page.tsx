@@ -131,9 +131,9 @@ function Home() {
 					)}
 
 					<div className="flex gap-2">
-						<Button onClick={isCameraOpen ? stopCamera : startCamera}>
+						<Button onClick={isCameraOpen ? stopCamera : startCamera} disabled={true}>
 							<Camera className="mr-2 h-4 w-4" />
-							{isCameraOpen ? "Close Camera" : "Open Camera"}
+							{isCameraOpen ? "Close Camera" : "Open Camera (Coming soon)"}
 						</Button>
 
 						<Button variant="outline" onClick={() => document.getElementById("file-upload")?.click()}>
