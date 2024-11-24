@@ -76,13 +76,18 @@ function Home() {
 		formData.append("file", image!, "food.png");
 
 		try {
-			fetch(
+			const response = await fetch(
 				"/api/image/analyse",
 				{
 					method: "POST",
 					body: formData
 				}
 			);
+
+			const data = await response.json();
+			const ingredients = data.ingredients as string[];
+			// TODO: temp for now the API returns the ingredients, but will return recipes in the future
+			alert(ingredients);
 
 			// This is where you would implement the actual API call to OpenAI
 			// For demonstration, we'll simulate a response
