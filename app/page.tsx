@@ -3,13 +3,13 @@
 import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { Camera, Upload, ChefHat, Loader2 } from "lucide-react";
-import Markdown from "react-markdown";
 
 import recipe from "@/models/recipe";
 
+import AlertBox from "@/components/alertbox";
+import Recipe from "@/components/recipe";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 function Home() {
 	const [image, setImage] = useState<File>();
@@ -102,13 +102,9 @@ function Home() {
 						Take a photo or upload an image of your ingredients to get recipe ideas
 					</CardDescription>
 				</CardHeader>
+
 				<CardContent className="space-y-4">
-					{error && (
-						<Alert variant="destructive">
-							<AlertTitle>Error</AlertTitle>
-							<AlertDescription>{error}</AlertDescription>
-						</Alert>
-					)}
+					{error && <AlertBox alert={error}/>}
 
 					<div className="flex gap-2">
 						<Button onClick={isCameraOpen ? stopCamera : startCamera} disabled={true}>
@@ -155,6 +151,7 @@ function Home() {
 								height={500}
 								width={500}
 							/>
+
 							<Button
 								className="w-full"
 								onClick={generateRecipes}
@@ -175,27 +172,7 @@ function Home() {
 						</div>
 					)}
 
-					{recipeData && (
-						<div className="space-y-4">
-							<Card>
-								<CardHeader>
-									<CardTitle>{recipeData.name}</CardTitle>
-								</CardHeader>
-								<CardContent>
-									<div className="space-y-2">
-										<h4 className="font-semibold">Ingredients:</h4>
-										<ul className="list-disc pl-4">
-											{recipeData.ingredients.map((ingredient, i) => (
-												<li key={i}>{ingredient}</li>
-											))}
-										</ul>
-										<h4 className="font-semibold">Instructions:</h4>
-										<Markdown className="whitespace-pre-line">{recipeData.method}</Markdown>
-									</div>
-								</CardContent>
-							</Card>
-						</div>
-					)}
+					{recipeData && <Recipe recipe={recipeData}/>}
 				</CardContent>
 			</Card>
 		</div>
