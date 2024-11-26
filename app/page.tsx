@@ -21,7 +21,6 @@ function Home() {
 	const videoRef = useRef<any>(null);
 	const streamRef = useRef<any>(null);
 
-	// TODO: need to get this working
 	const startCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -107,9 +106,9 @@ function Home() {
 					{error && <AlertBox alert={error}/>}
 
 					<div className="flex gap-2">
-						<Button onClick={isCameraOpen ? stopCamera : startCamera} disabled={true}>
+						<Button onClick={isCameraOpen ? stopCamera : startCamera}>
 							<Camera className="mr-2 h-4 w-4" />
-							{isCameraOpen ? "Close Camera" : "Open Camera (Coming soon)"}
+							{isCameraOpen ? "Close Camera" : "Open Camera"}
 						</Button>
 
 						<Button variant="outline" onClick={() => document.getElementById("file-upload")?.click()}>
@@ -137,7 +136,7 @@ function Home() {
 								className="absolute bottom-4 left-1/2 transform -translate-x-1/2"
 								onClick={capturePhoto}
 							>
-                Take Photo
+								Take Photo
 							</Button>
 						</div>
 					)}
