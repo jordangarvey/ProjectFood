@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import { Camera, Upload, ChefHat, Loader2 } from "lucide-react";
 
@@ -21,14 +21,21 @@ function Home() {
 	const videoRef = useRef<any>(null);
 	const streamRef = useRef<any>(null);
 
+	useEffect(() => {
+		if (isCameraOpen && streamRef.current) {
+			videoRef.current.srcObject = streamRef.current;
+		}
+	}, [isCameraOpen]);
+
 	const startCamera = async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-			videoRef.current.srcObject = stream;
 			streamRef.current = stream;
+
 			setIsCameraOpen(true);
 			setError(undefined);
-		} catch {
+		} catch (error) {
+			console.error(error);
 			setError("Unable to access camera. Please make sure you have granted camera permissions.");
 		}
 	};
@@ -36,15 +43,18 @@ function Home() {
 	const stopCamera = () => {
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track: any) => track.stop());
-			setIsCameraOpen(false);
 		}
+
+		setIsCameraOpen(false);
 	};
 
 	const capturePhoto = () => {
 		const video = videoRef.current;
 		const canvas = document.createElement("canvas");
+
 		canvas.width = video.videoWidth;
 		canvas.height = video.videoHeight;
+
 		canvas.getContext("2d")?.drawImage(video, 0, 0);
 
 		canvas.toBlob((blob) => {
