@@ -4,7 +4,7 @@ const rekognitionClient = new RekognitionClient({ region: process.env.AWS_REGION
 
 const ignoredLabels = [
 	"Food", "Brunch", "Produce", "Meal", "Dish", "Lunch",
-	"Breakfast", "Supper", "Dinner", "Cuisine"
+	"Breakfast", "Supper", "Dinner", "Cuisine", "Snack"
 ];
 
 function selectFoodLabels(labels: Label[]) {
@@ -19,7 +19,7 @@ function selectFoodLabels(labels: Label[]) {
 		}
 
 		// Only consider food labels with a confidence of 70% or higher
-		if (categoryName?.toLowerCase().includes("food") && label.Confidence > 70) {
+		if (categoryName?.toLowerCase().includes("food") && label.Confidence > 50) {
 			// Filter out some generic labels
 			if (ignoredLabels.includes(label.Name)) {
 				console.warn(`Ignoring generic label: ${label.Name}`);
