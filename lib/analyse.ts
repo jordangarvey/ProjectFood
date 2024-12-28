@@ -2,8 +2,11 @@ import { RekognitionClient, DetectLabelsCommand, Label } from "@aws-sdk/client-r
 
 const rekognitionClient = new RekognitionClient({ region: process.env.AWS_REGION });
 
-// FIXME: this sometimes includes the label `food`, `produce`, `brunch` _etc_.
-// Need to see if we can filter just by specific food items.
+const ignoredLabels = [
+	"Food", "Brunch", "Produce", "Meal", "Dish", "Lunch",
+	"Breakfast", "Supper", "Dinner", "Cuisine"
+];
+
 function selectFoodLabels(labels: Label[]) {
 	const ingredients: string[] = [];
 
@@ -17,6 +20,12 @@ function selectFoodLabels(labels: Label[]) {
 
 		// Only consider food labels with a confidence of 70% or higher
 		if (categoryName?.toLowerCase().includes("food") && label.Confidence > 70) {
+			// Filter out some generic labels
+			if (ignoredLabels.includes(label.Name)) {
+				console.warn(`Ignoring generic label: ${label.Name}`);
+				continue;
+			}
+
 			ingredients.push(label.Name);
 		}
 	}
