@@ -7,4 +7,5 @@ A small side project that allows a photo to be taken & uploaded to the Next serv
 To start run `npm run dev`.
 
 ## Envionment variables
-**TODO**
+* `OPENAI_API_KEY` — from the OpenAI dashboard.
+* AWS variables — set from the CLI tool locally, set by AWS in prod.
