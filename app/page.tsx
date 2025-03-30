@@ -22,7 +22,7 @@ function Home() {
 	const streamRef = useRef<any>(null);
 
 	// TODO: need to get this working
-	const startCamera = async () => {
+	async function startCamera() {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 			videoRef.current.srcObject = stream;
@@ -32,16 +32,16 @@ function Home() {
 		} catch {
 			setError("Unable to access camera. Please make sure you have granted camera permissions.");
 		}
-	};
+	}
 
-	const stopCamera = () => {
+	function stopCamera() {
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track: any) => track.stop());
 			setIsCameraOpen(false);
 		}
-	};
+	}
 
-	const capturePhoto = () => {
+	function capturePhoto() {
 		const video = videoRef.current;
 		const canvas = document.createElement("canvas");
 		canvas.width = video.videoWidth;
@@ -54,16 +54,16 @@ function Home() {
 				stopCamera();
 			}
 		}, "image/jpeg");
-	};
+	}
 
-	const handleFileUpload = (event: any) => {
+	function handleFileUpload(event: any) {
 		const file = event.target.files[0];
 		if (file) {
 			setImage(file);
 		}
-	};
+	}
 
-	const generateRecipes = async () => {
+	async function generateRecipes() {
 		if (isLoading) return;
 
 		setIsLoading(true);
@@ -91,7 +91,7 @@ function Home() {
 		} finally {
 			setIsLoading(false);
 		}
-	};
+	}
 
 	return (
 		<div className="max-w-2xl mx-auto p-4 space-y-4">
