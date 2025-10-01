@@ -8,4 +8,4 @@ To start run `npm run dev`.
 
 ## Envionment variables
 * `OPENAI_API_KEY` — from the OpenAI dashboard.
-* AWS variables — set from the CLI tool locally, set by AWS in prod.
+* AWS variables — set these from the CLI tool locally, set by AWS in prod.
