@@ -13,4 +13,5 @@ function AlertBox(props: { alert: string; }) {
 	);
 }
 
-export default AlertBox;
+// Memoize component to prevent unnecessary re-renders
+export default React.memo(AlertBox);

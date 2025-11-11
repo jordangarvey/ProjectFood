@@ -3,10 +3,12 @@ import { z } from "zod";
 
 import recipe from "@/models/recipe";
 
+// Instantiate OpenAI client at module level for connection reuse and better performance
+const ai = new OpenAI({
+	apiKey: process.env.OPENAI_API_KEY,
+});
+
 async function generateRecipe(ingredients: string[]): Promise<recipe> {
-	const ai = new OpenAI({
-		apiKey: process.env.OPENAI_API_KEY,
-	});
 
 	try {
 		const response = await ai.chat.completions.create({

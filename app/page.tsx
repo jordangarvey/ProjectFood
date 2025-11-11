@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import Image from "next/image";
 import { Camera, Upload, ChefHat, Loader2 } from "lucide-react";
 
@@ -21,8 +21,24 @@ function Home() {
 	const videoRef = useRef<any>(null);
 	const streamRef = useRef<any>(null);
 
+	// Create object URL for image preview with proper cleanup to prevent memory leaks
+	const imagePreviewUrl = useMemo(() => {
+		if (!image) return null;
+		return URL.createObjectURL(image);
+	}, [image]);
+
+	// Cleanup object URL when component unmounts or image changes
+	useEffect(() => {
+		return () => {
+			if (imagePreviewUrl) {
+				URL.revokeObjectURL(imagePreviewUrl);
+			}
+		};
+	}, [imagePreviewUrl]);
+
+	// Memoize callback functions to prevent unnecessary re-renders of child components
 	// TODO: need to get this working
-	async function startCamera() {
+	const startCamera = useCallback(async () => {
 		try {
 			const stream = await navigator.mediaDevices.getUserMedia({ video: true });
 			videoRef.current.srcObject = stream;
@@ -32,16 +48,16 @@ function Home() {
 		} catch {
 			setError("Unable to access camera. Please make sure you have granted camera permissions.");
 		}
-	}
+	}, []);
 
-	function stopCamera() {
+	const stopCamera = useCallback(() => {
 		if (streamRef.current) {
 			streamRef.current.getTracks().forEach((track: any) => track.stop());
 			setIsCameraOpen(false);
 		}
-	}
+	}, []);
 
-	function capturePhoto() {
+	const capturePhoto = useCallback(() => {
 		const video = videoRef.current;
 		const canvas = document.createElement("canvas");
 		canvas.width = video.videoWidth;
@@ -54,16 +70,16 @@ function Home() {
 				stopCamera();
 			}
 		}, "image/jpeg");
-	}
+	}, [stopCamera]);
 
-	function handleFileUpload(event: any) {
+	const handleFileUpload = useCallback((event: any) => {
 		const file = event.target.files[0];
 		if (file) {
 			setImage(file);
 		}
-	}
+	}, []);
 
-	async function generateRecipes() {
+	const generateRecipes = useCallback(async () => {
 		if (isLoading) return;
 
 		setIsLoading(true);
@@ -91,7 +107,7 @@ function Home() {
 		} finally {
 			setIsLoading(false);
 		}
-	}
+	}, [isLoading, image]);
 
 	return (
 		<div className="max-w-2xl mx-auto p-4 space-y-4">
@@ -142,10 +158,10 @@ function Home() {
 						</div>
 					)}
 
-					{image && !isCameraOpen && (
+					{image && !isCameraOpen && imagePreviewUrl && (
 						<div className="space-y-4">
 							<Image
-								src={URL.createObjectURL(image)}
+								src={imagePreviewUrl}
 								alt="Captured ingredients"
 								className="w-full rounded-lg"
 								height={500}

@@ -1,9 +1,15 @@
 import React from "react";
-import Markdown from "react-markdown";
+import dynamic from "next/dynamic";
 
 import recipe from "@/models/recipe";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+// Dynamically import Markdown component to reduce initial bundle size
+const Markdown = dynamic(() => import("react-markdown"), {
+	loading: () => <div className="animate-pulse h-4 bg-gray-200 rounded"></div>,
+	ssr: false,
+});
 
 function Recipes(props: { recipe: recipe; }) {
 	const { recipe } = props;
@@ -32,4 +38,5 @@ function Recipes(props: { recipe: recipe; }) {
 	);
 }
 
-export default Recipes;
+// Memoize component to prevent unnecessary re-renders when parent re-renders
+export default React.memo(Recipes);
