@@ -3,6 +3,10 @@ import { z } from "zod";
 
 import recipe from "@/models/recipe";
 
+/**
+ * Takes an array or ingredients, and sends these to
+ * ChatGPT with a prompt to turn it into a recipe.
+ */
 async function generateRecipe(ingredients: string[]): Promise<recipe> {
 	const ai = new OpenAI({
 		apiKey: process.env.OPENAI_API_KEY,
